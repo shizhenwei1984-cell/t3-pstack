@@ -1,42 +1,19 @@
 ---
 name: tdd
-description: "Use only when the user explicitly asks for TDD, a failing test, or a regression test, OR when the bug has an obvious cheap local test target. Skip when the test path is unclear, expensive, integration-heavy, or not requested."
+description: "Apply before each implementation change, including features, fixes, refactors, performance work and one-line edits. Applies to coordinators and code-writing workers."
 disable-model-invocation: true
 ---
 
-# TDD Bug Fix
+# Test-driven development
 
-When fixing a bug with a clear, cheap test path, make the broken behavior executable before changing production code. The goal is a focused regression test that fails before the fix and passes after it.
+Read-only investigation, documentation-only edits and test authoring can proceed directly. Apply this workflow before editing any implementation, including executable scripts, behavior-changing configuration and code in candidate worktrees.
 
-Do not force a test when it would be impractical. If the available test would require broad harness setup, brittle mocks, slow end-to-end infrastructure, production-only state, vague reproduction steps, or large unrelated fixture churn, skip adding a new test and use the closest useful verification instead.
+1. **Choose the contract.** State the observable result and select the smallest repeatable check that exercises the real path. Reuse a suitable existing regression, integration or browser test. Add a focused check when needed.
+2. **Red.** Run the check against the unchanged implementation in the checkout where the change will be made. Record the command and its actual failure. Confirm that it detects the requested behavior or constraint. Fix unrelated setup failures first. An existing failure qualifies when it meets these criteria.
+3. **Green.** Make the smallest implementation change that satisfies the contract. Rerun the same check, with the same assertion, and record its passing result.
+4. **Refactor and verify.** Clean up while the tests stay green. Run relevant surrounding tests. Repeat from Red for the next independent change.
+5. **Hand back the evidence.** Include the test path, commands, observed Red and Green, and the surrounding checks run. The coordinator checks this evidence before accepting a delegated change.
 
-## Workflow
+For a behavior-preserving refactor, run a characterization test on the original code and keep it green throughout. For the initial Red, use a meaningful additional requirement of the requested refactor, such as a migrated public interface or removal of a prohibited dependency. Performance work can use a repeatable measured budget. Never manufacture Red by damaging working code, weakening assertions, or asserting arbitrary source text.
 
-1. **Understand the bug.** Identify the intended behavior, current behavior, affected path, and smallest observable reproduction.
-2. **Choose the narrowest executable check.** Prefer the closest unit, component, integration, or regression test already used for that codepath. If no practical test path is obvious, do not create one from scratch just to satisfy the workflow.
-3. **Write the failing test first.** Add the smallest focused test that would have caught the bug. The test should encode intended behavior, not mirror the current implementation.
-4. **Run the new test before fixing.** Confirm it fails for the intended reason. If it passes or fails for an unrelated reason, correct the test or reproduction before editing the implementation.
-5. **Fix the bug.** Make the smallest production change that satisfies the intended behavior while preserving nearby contracts.
-6. **Rerun the regression test.** Confirm the test now passes.
-
-## If a Failing Test Is Impractical
-
-Use the closest executable regression check instead: a targeted script, manual reproduction command, browser automation, snapshot comparison, log assertion, or focused integration check.
-
-Prefer no new test over a bad test. A bad test is one that mostly tests mocks, encodes current implementation details, depends on timing or unrelated global state, needs expensive infrastructure for a small fix, or would be deleted immediately after proving the fix.
-
-## Guardrails
-
-- Do not change tests merely to match a wrong implementation.
-- Do not weaken existing assertions unless the expected behavior has genuinely changed and the reason is clear.
-- Keep the regression test focused on the bug. Avoid broad fixture churn or unrelated coverage expansion.
-- If the bug is flaky, make the test deterministic where possible and document the signal being locked down.
-- If the bug exposes a broader class of failures, first land the focused regression path, then consider additional sibling coverage.
-
-## Final Response
-
-Report the evidence, not just the outcome:
-
-- Name the failing-before test or executable check and the failure it produced.
-- Name the passing-after test run and any nearby validation performed.
-- If failing-before evidence could not be demonstrated, state why and describe the closest regression check used instead.
+Stop before editing implementation code if a meaningful Red cannot be demonstrated. Report the missing prerequisite or contract. The user can explicitly make an exception for that task.

@@ -2,6 +2,10 @@
 
 This file is the release changelog, with one `## <version> - <title>` entry per release, newest first. The Cursor-to-T3 rewrite rules live in [`tools/substitutions.json`](tools/substitutions.json), and the [sync boundary](CONTRIBUTING.md#the-sync-boundary) in `CONTRIBUTING.md` defines how a change to upstream's skill content is declared.
 
+## 2.6.2-explore.2 - Require test-first implementation
+
+Every pstack code writer follows the bundled TDD workflow. Record a meaningful failing run before editing implementation, then rerun the same check and the relevant suite. Behavior-preserving work keeps a characterization baseline. A missing executable Red blocks the edit.
+
 ## 2.6.2-explore.1 - Delegate evidence collection to the explore role
 
 The personal fork routes code, log and history research through the single-target explore role. The calling thread interprets the evidence and writes the final answer. Rerun the installer to update installed copies.

@@ -1,6 +1,24 @@
 {
   "substitutions": [
     {
+      "pattern": "if there's a cheap test path, /tdd it.",
+      "replacement": "capture a failing automated check.",
+      "files": "^skills/poteto-help/references/recipes\\.md$",
+      "rationale": "Document the personal fork’s mandatory test-first workflow."
+    },
+    {
+      "pattern": "Bug with a cheap test:",
+      "replacement": "Bug fix:",
+      "files": "^skills/poteto-help/references/recipes\\.md$",
+      "rationale": "Document the personal fork’s mandatory test-first workflow."
+    },
+    {
+      "pattern": "Fix a bug test-first when a cheap local test exists",
+      "replacement": "Change implementation code with a failing check first",
+      "files": "^skills/poteto-help/SKILL\\.md$",
+      "rationale": "Document the personal fork’s mandatory test-first workflow."
+    },
+    {
       "pattern": "Delegate investigation and the fix to subagents, stay in the lead.",
       "replacement": "Delegate source and log investigation to the explore worker. Use the bug-fix worker for implementation and evaluate the evidence in the calling thread.",
       "files": "^skills/poteto-mode/playbooks/bug-fix\\.md$",
