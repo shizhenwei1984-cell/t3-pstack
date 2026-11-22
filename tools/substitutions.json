@@ -1,6 +1,84 @@
 {
   "substitutions": [
     {
+      "pattern": "Delegate investigation and the fix to subagents, stay in the lead.",
+      "replacement": "Delegate source and log investigation to the explore worker. Use the bug-fix worker for implementation and evaluate the evidence in the calling thread.",
+      "files": "^skills/poteto-mode/playbooks/bug-fix\\.md$",
+      "rationale": "Apply the personal explore route to this workflow’s evidence collection."
+    },
+    {
+      "pattern": "Parse large artifacts in a subagent",
+      "replacement": "Delegate artifact inspection at every size to the configured explore worker",
+      "files": "^skills/poteto-mode/playbooks/trace-forensics\\.md$",
+      "rationale": "Apply the personal explore route to this workflow’s evidence collection."
+    },
+    {
+      "pattern": "Survey recent agent conversations within that scope for recurring patterns.",
+      "replacement": "Have explore workers collect cited observations from recent agent conversations in scope. Decide which patterns recur in the calling thread.",
+      "files": "^skills/automate-me/SKILL\\.md$",
+      "rationale": "Apply the personal explore route to this workflow’s evidence collection."
+    },
+    {
+      "pattern": "## Phase A: Frame",
+      "replacement": "## Phase A: Frame\n\nApply step 3 to implementation and comparison workers. For source, log or history investigation, the target in both phases is the explore entry with its explicit options. Return observations to the calling thread for synthesis.",
+      "files": "^skills/swarm/SKILL\\.md$",
+      "rationale": "Apply the personal explore route to this workflow’s evidence collection."
+    },
+    {
+      "pattern": "One read-only subagent per feature file, launched concurrently. Each explains \"how does this user-facing feature work?\" from source",
+      "files": "^skills/maintain-verification-skill/SKILL\\.md$",
+      "replacement": "One read-only explore worker per feature file, launched concurrently with the configured explore target. Each traces the feature from source",
+      "rationale": "Personal fork: separate read-only evidence collection from the caller’s explanation and judgment."
+    },
+    {
+      "pattern": "Trace the code the question is about.",
+      "files": "^skills/poteto-mode/playbooks/investigation\\.md$",
+      "replacement": "Send the code trace to the configured explore worker. Use its cited observations to build the answer.",
+      "rationale": "Personal fork: separate read-only evidence collection from the caller’s explanation and judgment."
+    },
+    {
+      "pattern": "skip the fan-out and search directly",
+      "files": "^skills/recall/SKILL\\.md$",
+      "replacement": "dispatch a single explore worker for the search",
+      "rationale": "Personal fork: separate read-only evidence collection from the caller’s explanation and judgment."
+    },
+    {
+      "pattern": "on a fast, cheap model",
+      "files": "^skills/recall/SKILL\\.md$",
+      "replacement": "using the configured `explore` target and all its options",
+      "rationale": "Personal fork: separate read-only evidence collection from the caller’s explanation and judgment."
+    },
+    {
+      "pattern": "Read the code yourself to get oriented",
+      "files": "^skills/teach/SKILL\\.md$",
+      "replacement": "Use the evidence returned by the `explore` worker for orientation",
+      "rationale": "Personal fork: separate read-only evidence collection from the caller’s explanation and judgment."
+    },
+    {
+      "pattern": "read the commits and PR discussions",
+      "files": "^skills/why/SKILL\\.md$",
+      "replacement": "ask the configured `explore` worker for cited evidence from the commits and PR discussions",
+      "rationale": "Personal fork: separate read-only evidence collection from the caller’s explanation and judgment."
+    },
+    {
+      "pattern": "Present the subagent's output. Light edits for clarity or context from the conversation are fine. Do not substantially rewrite it.",
+      "files": "^skills/how/SKILL\\.md$",
+      "replacement": "Use the returned evidence to write your own explanation for the user. Label uncertainties and request further evidence from the explorer when needed.",
+      "rationale": "Personal fork: separate read-only evidence collection from the caller’s explanation and judgment."
+    },
+    {
+      "pattern": "> You are writing an architectural explanation for a senior engineer. Explore the codebase and write an explanation that a senior engineer unfamiliar with this area could read and walk away with a solid mental model. They should understand the architecture well enough to start working in it confidently. You have read-only access to the codebase.",
+      "files": "^skills/how/SKILL\\.md$",
+      "replacement": "> Trace the relevant code path. Return observed behavior, file and line references, and any unresolved questions. The caller will write the explanation.",
+      "rationale": "Personal fork: separate read-only evidence collection from the caller’s explanation and judgment."
+    },
+    {
+      "pattern": "## 1. Explain",
+      "files": "^skills/how/SKILL\\.md$",
+      "replacement": "## 1. Collect evidence",
+      "rationale": "Personal fork: separate read-only evidence collection from the caller’s explanation and judgment."
+    },
+    {
       "pattern": "Older defaults put another Gemini model, then `gemini-4-neon-high`, in the panel seat. So in any rule, a `gemini-4-neon-high` entry, or a `gemini-4-*` entry other than `gemini-4-neon-*`, in a panel role (`arena runners`, `arena cross-judge pool`, `interrogate reviewers`) is an old default. Each one becomes `gemini-4-neon-xhigh`. A Gemini 4 Neon entry at any other level is the user's choice and stays. Tell the user which entries you replaced.",
       "files": "^skills/setup-pstack/SKILL\\.md$",
       "replacement": "Older defaults put another Gemini model, then Gemini 4 Neon at a `high` reasoning level, in the panel seat. So in any sheet, a Gemini 4 Neon entry at `high`, or an entry whose model ID's last `/` part matches `gemini-4-*` other than Gemini 4 Neon, in a panel role (`arena runners`, `arena cross-judge pool`, `interrogate reviewers`) is an old default. Each one becomes Gemini 4 Neon at `xhigh` on the same provider instance, such as `antigravity/gemini-4-neon thought_level=xhigh`, if `orchestrator_capabilities` with `search: \"gemini-4-neon\"` lists it there. A Gemini 4 Neon entry at any other level is the user's choice and stays. Tell the user which entries you replaced.",
@@ -324,8 +402,8 @@
     },
     {
       "pattern": "its checkout, its uncommitted changes, or a process it still runs.",
-      "replacement": "its checkout, its uncommitted changes, or a process it still runs.\n\n**Dispatch on T3.** Every subagent is a `delegate_task` call from the chat that runs the playbook, same model family included, so every child shows up in T3. When you are a `delegate_task` child, you are a leaf. Do the work yourself, and start no subagent unless your brief names one. Give each call its own `clientRequestId`, stable across retries of that call, and keep each returned `taskId`. A child's completion wakes this thread, so end the turn instead of polling, and call `task_status` only when a result is needed mid-turn. `task_cancel` stops a child, and `task_status` confirms it stopped. A child gets only its brief, never your context, so pass absolute paths. `<plugin root>` is the absolute path of the directory that holds this plugin's `skills/` and `agents/`. A persona (`poteto-agent`, `comment-sicko`, `thermo-nuclear-review-subagent`, `thermo-nuclear-code-quality-review-subagent`) is a brief whose next line after the worker.md pointer is \"Read `<plugin root>/agents/<name>.md` in full and act as it says\", and a `poteto-agent` brief also names this file's absolute path. Where a skill says a brief opens with a persona's read, the worker.md pointer still comes first.\n\nA child starts in your checkout, which suits one writer while you write nothing. A writer that runs beside other writers or your own edits gets `isolation: \"worktree\"`, and T3 gives it a new worktree and branch from your thread's checkout at its `HEAD` commit. Commit what it builds on first, because uncommitted edits stay behind. A child that must start from another commit, such as a PR head or fresh trunk, gets `isolation: \"worktree\"` even when it only reads. Its brief names that commit or ref, and before anything else the child runs `git fetch` and moves its own branch there with `git reset --hard`. T3 can rename that branch during the run, so the brief tells the child to end its reply with the output of `pwd`, `git branch --show-current`, and `git rev-parse HEAD`. After review, bring its commits onto your branch with `git merge <branch>`, which fast-forwards when your branch has not moved. A PR opens only from a T3 thread's branch, yours or that of a child that owns the PR. In a repo with no commit yet, `delegate_task` refuses the worktree with `Unable to resolve the parent checkout commit`, so commit first. When this thread's project is not a git checkout, which gets the same refusal, when your work lives in a checkout other than the one `t3_worktree_status` names, or when you copy uncommitted changes into the child's worktree, create that worktree with `git worktree add` from `HEAD` instead. Remove that worktree and its branch after the result. A child sent into a worktree it does not own, one you made this way or one a finished worker left, keeps `isolation: \"shared\"`. Its brief names that absolute path as the only place it writes, and tells it to run every command there (`workdir` on Codex) and to edit by absolute path. Record your own `git status --porcelain` before you dispatch a writer to another checkout, and check after the result that it is unchanged. A step a playbook says to delegate goes to `delegate_task` on that role's sheet entry, not into your own tool calls, unless you state a reason such as a step too small to brief. A research delegate no role names omits `target`, so it runs on the parent model. A model's family is the first segment of its ID's last `/` part, such as `claude`, `gpt`, or `gemini`, whatever provider instance serves it, except that Fable (`claude-fable-*`) is its own family, and your own family is the one in `orchestrator_capabilities`' `inheritedModel`. A rejected target runs on another target of the same family from `orchestrator_capabilities`, and you say so. `orchestrator_capabilities` lists a short set of models per provider, and its `search` finds the others. A required review with no reviewer from another family stays `BLOCKED: independent review`.\n\nEnd every reply that ran a playbook with a dispatch ledger: one line per delegated step, naming the role and the `providerInstanceId/model` it ran on, or `in-thread: <reason>`.",
-      "rationale": "inserts the T3 dispatch policy at the end of the Subagents section, after the Fresh subagents paragraph (Tool actions; Subagent policy). A delegate_task child keeps delegate_task, so the leaf sentence stops the session-start routing from sending a child into a playbook's fan-out (#21). A writer gets T3's worktree isolation, which starts from the thread checkout's HEAD commit and refuses a thread whose project is not a git checkout or has no commit, so git worktree add stays only for those (#50). A child whose worktree gets uncommitted changes copied in, as interrogate's adversaries do, needs that fallback too, because isolation leaves uncommitted edits out. Isolation always starts at the parent's HEAD, so a child bound for a PR head or fresh trunk fetches and resets its own branch there, a child sent into a worktree it does not own works there by path, and the report names pwd so a parent learns a worktree it could not name at spawn (Cursor Bugbot on #68). A research delegate no role names, such as how's one explainer or recall's investigators, runs on the parent model, as upstream's Task call without a model does. The family rule keeps upstream's Fable exception. A persona brief keeps upstream's worker.md pointer as its first line",
+      "replacement": "its checkout, its uncommitted changes, or a process it still runs.\n\n**Dispatch on T3.** Every subagent is a `delegate_task` call from the chat that runs the playbook, same model family included, so every child shows up in T3. When you are a `delegate_task` child, you are a leaf. Do the work yourself, and start no subagent unless your brief names one. Give each call its own `clientRequestId`, stable across retries of that call, and keep each returned `taskId`. A child's completion wakes this thread, so end the turn instead of polling, and call `task_status` only when a result is needed mid-turn. `task_cancel` stops a child, and `task_status` confirms it stopped. A child gets only its brief, never your context, so pass absolute paths. `<plugin root>` is the absolute path of the directory that holds this plugin's `skills/` and `agents/`. A persona (`poteto-agent`, `comment-sicko`, `thermo-nuclear-review-subagent`, `thermo-nuclear-code-quality-review-subagent`) is a brief whose next line after the worker.md pointer is \"Read `<plugin root>/agents/<name>.md` in full and act as it says\", and a `poteto-agent` brief also names this file's absolute path. Where a skill says a brief opens with a persona's read, the worker.md pointer still comes first.\n\nA child starts in your checkout, which suits one writer while you write nothing. A writer that runs beside other writers or your own edits gets `isolation: \"worktree\"`, and T3 gives it a new worktree and branch from your thread's checkout at its `HEAD` commit. Commit what it builds on first, because uncommitted edits stay behind. A child that must start from another commit, such as a PR head or fresh trunk, gets `isolation: \"worktree\"` even when it only reads. Its brief names that commit or ref, and before anything else the child runs `git fetch` and moves its own branch there with `git reset --hard`. T3 can rename that branch during the run, so the brief tells the child to end its reply with the output of `pwd`, `git branch --show-current`, and `git rev-parse HEAD`. After review, bring its commits onto your branch with `git merge <branch>`, which fast-forwards when your branch has not moved. A PR opens only from a T3 thread's branch, yours or that of a child that owns the PR. In a repo with no commit yet, `delegate_task` refuses the worktree with `Unable to resolve the parent checkout commit`, so commit first. When this thread's project is not a git checkout, which gets the same refusal, when your work lives in a checkout other than the one `t3_worktree_status` names, or when you copy uncommitted changes into the child's worktree, create that worktree with `git worktree add` from `HEAD` instead. Remove that worktree and its branch after the result. A child sent into a worktree it does not own, one you made this way or one a finished worker left, keeps `isolation: \"shared\"`. Its brief names that absolute path as the only place it writes, and tells it to run every command there (`workdir` on Codex) and to edit by absolute path. Record your own `git status --porcelain` before you dispatch a writer to another checkout, and check after the result that it is unchanged. A step a playbook says to delegate goes to `delegate_task` on that role's sheet entry, not into your own tool calls, unless you state a reason such as a step too small to brief. For every pstack skill and playbook, delegate each investigation of source code, logs, traces, commits, PR discussions or chat history via delegate_task with role \"research\" and the explore target from the model sheet (fallback: the explore entry in poteto-mode’s Models section). Pass every listed option explicitly, including boolean fastMode=false. The explorer works read-only and returns paths and lines, log events, commit or thread IDs, observations and gaps. The calling thread explains the evidence and makes all final judgments. This applies to small lookups, orientation and research inside mixed tasks. For a mixed worker task, collect the evidence first and pass it to the implementation, review or browser worker; route additional research back through the coordinator. An explorer reads the sources itself without delegating recursively. If the configured target fails, report the failure to the caller. A model's family is the first segment of its ID's last `/` part, such as `claude`, `gpt`, or `gemini`, whatever provider instance serves it, except that Fable (`claude-fable-*`) is its own family, and your own family is the one in `orchestrator_capabilities`' `inheritedModel`. A rejected target runs on another target of the same family from `orchestrator_capabilities`, and you say so. `orchestrator_capabilities` lists a short set of models per provider, and its `search` finds the others. A required review with no reviewer from another family stays `BLOCKED: independent review`.\n\nEnd every reply that ran a playbook with a dispatch ledger: one line per delegated step, naming the role and the `providerInstanceId/model` it ran on, or `in-thread: <reason>`.",
+      "rationale": "Routes T3 research through the configured explore target. The caller owns interpretation and the final response.",
       "files": "^skills/poteto-mode/SKILL\\.md$"
     },
     {
@@ -407,8 +485,8 @@
     },
     {
       "pattern": "Spawn one Task subagent with `subagent_type: generalPurpose` and `readonly: true` that explores and explains in one pass.",
-      "replacement": "Spawn one `delegate_task` child with `role: \"research\"` that explores and explains in one pass. Leave `target` unset, so it runs on this chat's model.",
-      "rationale": "Per-skill notes: how. Upstream's Task call names no model, so the child runs on the parent model, and its brief already says it has read-only access",
+      "replacement": "Dispatch one read-only `delegate_task` child with `role: \"research\"` using the model sheet’s `explore` target and all its options.",
+      "rationale": "Routes T3 research through the configured explore target. The caller owns interpretation and the final response.",
       "files": "^skills/how/SKILL\\.md$"
     },
     {

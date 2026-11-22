@@ -10,12 +10,12 @@ Explore the codebase to answer "how does X work?" questions.
 
 If the scope is ambiguous, state your interpretation and explore. The user can redirect.
 
-## 1. Explain
+## 1. Collect evidence
 
-Spawn one `delegate_task` child with `role: "research"` that explores and explains in one pass. Leave `target` unset, so it runs on this chat's model. Give it the user's question and this brief:
+Dispatch one read-only `delegate_task` child with `role: "research"` using the model sheet’s `explore` target and all its options. Give it the user's question and this brief:
 
-> You are writing an architectural explanation for a senior engineer. Explore the codebase and write an explanation that a senior engineer unfamiliar with this area could read and walk away with a solid mental model. They should understand the architecture well enough to start working in it confidently. You have read-only access to the codebase.
+> Trace the relevant code path. Return observed behavior, file and line references, and any unresolved questions. The caller will write the explanation.
 
 ## 2. Present
 
-Present the subagent's output. Light edits for clarity or context from the conversation are fine. Do not substantially rewrite it.
+Use the returned evidence to write your own explanation for the user. Label uncertainties and request further evidence from the explorer when needed.

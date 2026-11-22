@@ -118,7 +118,7 @@ describe("applySubstitutions", () => {
     [
       "skills/how/SKILL.md",
       "Spawn one Task subagent with `subagent_type: generalPurpose` and `readonly: true` that explores and explains in one pass.",
-      'Spawn one `delegate_task` child with `role: "research"` that explores and explains in one pass. Leave `target` unset, so it runs on this chat\'s model.',
+      'Dispatch one read-only `delegate_task` child with `role: "research"` using the model sheet’s `explore` target and all its options.',
     ],
     [
       "skills/reflect/SKILL.md",

@@ -49,6 +49,7 @@
       "driverKind": "cursor",
       "displayName": "Cursor",
       "models": [
+        { "id": "composer-2.5", "options": [{ "id": "fastMode", "values": [false, true] }] },
         { "id": "default", "label": "Auto" },
         {
           "id": "grok-4.7",

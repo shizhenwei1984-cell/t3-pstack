@@ -70,13 +70,14 @@ describe("regions", () => {
   test("every skill a role names gets that role's tier default stamped in its Models section", () => {
     const marked = {
       ...models,
-      tiers: { default: "x/marker-default", fast: "x/marker-fast", panel: ["a/claude-p", "b/gpt-p"], judges: ["c/claude-j", "d/gemini-j"] },
+      tiers: { explore: "x/marker-explore", default: "x/marker-default", fast: "x/marker-fast", panel: ["a/claude-p", "b/gpt-p"], judges: ["c/claude-j", "d/gemini-j"] },
     };
     for (const skill of new Set(models.roles.map((r) => r.skill))) {
       const file = `plugins/pstack/skills/${skill}/SKILL.md`;
       const stamped = applyRegions(file, readFileSync(join(repoRoot, file), "utf8"), marked, { strict: true });
       for (const role of models.roles.filter((r) => r.skill === skill)) {
         const expected = {
+          explore: "`x/marker-explore`",
           default: "`x/marker-default`",
           fast: "`x/marker-fast`",
           panel: "`a/claude-p`, `b/gpt-p`",

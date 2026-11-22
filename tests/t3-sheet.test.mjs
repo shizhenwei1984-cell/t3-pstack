@@ -96,7 +96,7 @@ describe("checkSheet against a catalog", () => {
       check(
         [
           "bug-fix: claudeCode/claude-opus-5-5",
-          "perf-issue: cursor/grok-4.7",
+          "perf-issue: cursor-offline/grok-4.7",
           "judgment and prose: grok/grok-9",
           "swarm workers: claudeAgent/claude-opus-5-5 reasoningEffort=high",
           "feature, refactoring: codex/gpt-6.1-sol reasoningEffort=extreme",
@@ -105,7 +105,7 @@ describe("checkSheet against a catalog", () => {
       ),
     ).toEqual([
       'bug-fix: claudeCode/claude-opus-5-5: no provider instance "claudeCode" in this T3',
-      'perf-issue: cursor/grok-4.7: "cursor" cannot run child tasks (Provider is not authenticated.)',
+      'perf-issue: cursor-offline/grok-4.7: "cursor-offline" cannot run child tasks (Provider is not authenticated.)',
       'judgment and prose: grok/grok-9: "grok" does not list model "grok-9"',
       'swarm workers: claudeAgent/claude-opus-5-5: no option "reasoningEffort" (has effort, fastMode)',
       "feature, refactoring: codex/gpt-6.1-sol: reasoningEffort=extreme is not one of low, medium, high, xhigh, max, ultra",

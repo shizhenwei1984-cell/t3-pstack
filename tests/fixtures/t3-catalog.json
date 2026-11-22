@@ -70,6 +70,13 @@
     {
       "providerInstanceId": "cursor",
       "driverKind": "cursor",
+      "models": [{ "id": "composer-2.5", "options": [{ "id": "fastMode", "values": [false, true] }] }],
+      "canRunChildTask": true,
+      "canRunCrossProviderChildTask": true
+    },
+    {
+      "providerInstanceId": "cursor-offline",
+      "driverKind": "cursor",
       "models": [{ "id": "grok-4.7", "options": [] }],
       "canRunChildTask": false,
       "canRunCrossProviderChildTask": false,

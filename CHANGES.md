@@ -2,6 +2,10 @@
 
 This file is the release changelog, with one `## <version> - <title>` entry per release, newest first. The Cursor-to-T3 rewrite rules live in [`tools/substitutions.json`](tools/substitutions.json), and the [sync boundary](CONTRIBUTING.md#the-sync-boundary) in `CONTRIBUTING.md` defines how a change to upstream's skill content is declared.
 
+## 2.6.2-explore.1 - Delegate evidence collection to the explore role
+
+The personal fork routes code, log and history research through the single-target explore role. The calling thread interprets the evidence and writes the final answer. Rerun the installer to update installed copies.
+
 ## 2.6.1 - Babysit and Shipping wait on T3's PR watch
 
 Babysit's `drive` and Shipping's wait for the next PR's checks looped pstack's watcher inside the turn, in shell calls of up to 540 seconds. T3's `watch_pull_request` wakes a thread when a PR's checks, reviews, comments, or conflicts change, and agents already wait on it. A count of the maintainer's sessions found the watcher loop in 3 sessions and `watch_pull_request` in about 150. So the playbooks now wait one way on T3. The reason is simplicity, not time saved. The idea came from @yqecea in [#76](https://github.com/chhoumann/t3-pstack/pull/76), and [#88](https://github.com/chhoumann/t3-pstack/issues/88) tracked it.

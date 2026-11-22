@@ -1,5 +1,6 @@
 {
   "tiers": {
+    "explore": "cursor/composer-2.5 fastMode=false",
     "default": "claudeAgent/claude-opus-5-5 effort=xhigh",
     "fast": "claudeAgent/claude-opus-5-5 effort=high",
     "panel": [
@@ -13,6 +14,7 @@
     ]
   },
   "roles": [
+    { "role": "explore", "tier": "explore", "skill": "poteto-mode" },
     { "role": "feature, refactoring", "tier": "default", "skill": "poteto-mode" },
     { "role": "bug-fix", "tier": "default", "skill": "poteto-mode" },
     { "role": "perf-issue", "tier": "default", "skill": "poteto-mode" },

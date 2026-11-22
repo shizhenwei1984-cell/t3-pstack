@@ -17,6 +17,8 @@ Open a todolist with one entry per phase before launching anything.
 
 ## Phase A: Frame
 
+Apply step 3 to implementation and comparison workers. For source, log or history investigation, the target in both phases is the explore entry with its explicit options. Return observations to the calling thread for synthesis.
+
 1. State the done predicate and the artifact or report the swarm must return.
 2. Choose the shape. Partition into slices, race N workers on identical briefs, or mix both. For a race or mixed shape, declare `first pass`, `rank all`, or `best-of` before spawning.
 3. Pick the worker model from the `swarm workers` line in the model sheet. If the sheet or that line is missing, use the default in [Models](#models). For `auto` or `inherit-parent`, omit `target` so the workers run on the parent model. If `delegate_task` rejects an entry, use the default and say so. If it rejects the default, use another target of the same family from `orchestrator_capabilities`. For a model race, name each arm's model up front. Pick each subagent's reasoning level for the job, per the Subagents section of the **poteto-mode** skill.
