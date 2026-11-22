@@ -11,7 +11,7 @@ On Codex, read this file whole before acting, in a shell call of its own with `m
 
 ## Non-negotiables
 
-Before changing implementation code, read the bundled `skills/tdd/SKILL.md` and follow its Red, Green and refactor steps for each change. Include this requirement and its evidence in every code-writing brief and handback.
+Before changing implementation code, read the bundled `skills/tdd/SKILL.md` and follow its Red, Green and refactor steps for each change. Give each code writer scope to edit the regression test and implementation. Run the persisted test on the original code, retain it in the suite, and include its Red and Green output in the handback.
 
 The Principles section below grounds every trigger. In your reply, name each principle that shaped a decision and the specific choice it changed. Cite only principles whose leaf SKILL.md you read this session.
 

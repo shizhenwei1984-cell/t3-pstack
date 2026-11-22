@@ -17,3 +17,8 @@ test("TDD requires observed evidence and gives a blocked path when Red is unavai
   expect(skill).toContain("characterization");
   expect(read("skills/poteto-mode/playbooks/bug-fix.md")).not.toContain("Skip it when the test would be expensive");
 });
+
+test("a new regression stays in the project test suite", () => {
+  expect(read("skills/tdd/SKILL.md")).toContain("Save the test in the project test suite before the first implementation edit");
+  expect(read("skills/poteto-mode/worker.md")).toContain("persisted test");
+});

@@ -2,6 +2,10 @@
 
 This file is the release changelog, with one `## <version> - <title>` entry per release, newest first. The Cursor-to-T3 rewrite rules live in [`tools/substitutions.json`](tools/substitutions.json), and the [sync boundary](CONTRIBUTING.md#the-sync-boundary) in `CONTRIBUTING.md` defines how a change to upstream's skill content is declared.
 
+## 2.6.2-explore.3 - Keep the failing test in the project
+
+Every implementation brief includes ownership of the regression test. A one-off shell assertion can reproduce a bug, but the original code must fail the retained project test before the fix.
+
 ## 2.6.2-explore.2 - Require test-first implementation
 
 Every pstack code writer follows the bundled TDD workflow. Record a meaningful failing run before editing implementation, then rerun the same check and the relevant suite. Behavior-preserving work keeps a characterization baseline. A missing executable Red blocks the edit.
