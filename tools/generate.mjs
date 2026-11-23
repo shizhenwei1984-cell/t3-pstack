@@ -208,7 +208,7 @@ export function validatePluginLayout(pluginRoot) {
   }
 }
 
-const TIERS = ["explore", "default", "fast", "panel", "judges"];
+const TIERS = ["explore", "default", "fast", "panel", "judges", "comment-review"];
 // The tiers whose default is a list: the review and design panels, and the
 // arena cross-judge pool, which tries one judge from the list in order.
 const LIST_TIERS = ["panel", "judges"];
@@ -254,6 +254,8 @@ export function parseModels(raw, skillExists) {
       labels.add(label);
     }
     if (!TIERS.includes(role.tier)) fail(`role "${role.role}" names tier "${role.tier}", which tiers does not define`);
+    if (role.fixed !== undefined && typeof role.fixed !== "boolean") fail(`role "${role.role}" must set "fixed" to a boolean`);
+    if (role.fixed && LIST_TIERS.includes(role.tier)) fail(`fixed role "${role.role}" must name a single-entry tier`);
     if (!skillExists(role.skill)) fail(`role "${role.role}" names skill "${role.skill}", which has no SKILL.md`);
   }
   if (!Array.isArray(raw.retired)) fail('"retired" must be a list');

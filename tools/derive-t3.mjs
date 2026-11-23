@@ -83,7 +83,10 @@ const roleLine = (models, r) =>
   (r.alias ? ` (a \`${r.alias}\` line counts as this role)` : "");
 
 export function modelsSection(models, roles) {
-  return `Role defaults on T3, stamped from \`plugins/pstack/models.json\`. ${SHEET}\n\n${roles.map((r) => roleLine(models, r)).join("\n")}`;
+  const policy = roles.every((r) => r.fixed)
+    ? "Each role below uses its listed target. A missing model-sheet row uses that binding. An explicit row must match it exactly."
+    : SHEET;
+  return `Role defaults on T3, stamped from \`plugins/pstack/models.json\`. ${policy}\n\n${roles.map((r) => roleLine(models, r)).join("\n")}`;
 }
 
 // The sheet setup-pstack writes when the user keeps every default.
@@ -91,7 +94,7 @@ export function sheetBlock(models) {
   const rows = models.roles.map((r) => `${r.role}: ${entries(models, r).join(", ")}`);
   return [
     "# pstack model configuration (T3). One line per role. Delete a line to fall back to the skill default.",
-    "# `inherit-parent` or `auto` as a value: the role runs on the parent chat's model (`delegate_task` omits `target`). Alias entries in a panel list still count toward its fan-out.",
+    "# For configurable roles, `inherit-parent` or `auto` runs on the parent chat's model. Alias entries in a panel list still count toward its fan-out.",
     "# defaults: 3",
     "# budget: large (xhigh)",
     ...rows,

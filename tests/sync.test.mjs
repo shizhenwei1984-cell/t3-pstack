@@ -201,11 +201,19 @@ describe("applySubstitutions", () => {
     ["skills/poteto-mode/playbooks/shipping.md", "Merge it once its checks pass and its verdict survives.", ["When the session can call T3's `watch_pull_request`, wait for those checks on it as Babysit's `drive` does."]],
     ["skills/poteto-mode/playbooks/shipping.md", "On GitHub, watch the run with `scripts/watch-pr/watch-pr --queued-stack` under `/loop` until it reports `COMPLETE` at the ceiling. Pass the run's PR numbers, bottom-to-top, in `--stack-prs`, and pass the same list each time you restart the watcher.", ["when a merge queue or auto-merge lands the run, or the session cannot call `watch_pull_request`", "as a loop inside the turn", "does not wake on a merge"]],
     ["skills/poteto-mode/playbooks/autopilot-full.md", "Each owner is a Cursor cloud agent that builds, opens its PR", ["`delegate_task` child", "`isolation: \"worktree\"`", "t3_thread_send"]],
-    ["skills/no-comments/SKILL.md", '1. Spawn `Task` with `subagent_type: "comment-sicko"`. Pass the scope.', ["<plugin root>/agents/comment-sicko.md", "no worktree"]],
   ])("%s keeps its T3 insert", (rel, upstream, needles) => {
     const { text } = applySubstitutions(upstream, RULES.substitutions, rel);
     for (const needle of needles) expect(text).toContain(needle);
     expect(denylistHits(rel, text, RULES.denylist)).toEqual([]);
+  });
+
+  test("Comment Sicko dispatch replaces the whole upstream reasoning instruction", () => {
+    const upstream = '1. Spawn `Task` with `subagent_type: "comment-sicko"`. Pass the scope. Pick each subagent\'s reasoning level for the job, per the Subagents section of the **poteto-mode** skill. Do not restate its rules.';
+    const { text } = applySubstitutions(upstream, RULES.substitutions, "skills/no-comments/SKILL.md");
+    expect(text).toContain("--resolve-fixed-role comment-review");
+    expect(text).toContain("<plugin root>/agents/comment-sicko.md");
+    expect(text).toContain("no worktree");
+    expect(text).not.toContain("Pick each subagent");
   });
 });
 

@@ -10,6 +10,9 @@
 //   node t3-sheet.mjs <sheet.md> <catalog.json>
 //
 // prints one line per problem and exits 1 when there is any.
+// Setup can pass --allow-unavailable-fixed to report fixed-target availability
+// separately while validating the rest of the sheet.
+// --resolve-fixed-role <role> [sheet.md] prints that role's dispatch target.
 
 import { existsSync, readFileSync, realpathSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -67,6 +70,30 @@ export function parseSheet(markdown) {
     });
 }
 
+function readSheet(path) {
+  const bytes = readFileSync(path);
+  const encoding = bytes[0] === 0xff && bytes[1] === 0xfe ? "utf16le" : "utf8";
+  return parseSheet(bytes.toString(encoding));
+}
+
+function fixedEntryProblem(role, value, expected) {
+  if (value.trim().replace(/\s+/g, " ") !== expected) return `${role}: requires ${expected}`;
+  return null;
+}
+
+function resolveFixedRole(sheet, roleName, { roles, tiers }) {
+  const role = roles.find((r) => r.role === roleName && r.fixed);
+  if (!role) throw new Error(`"${roleName}" is not a fixed pstack role`);
+  const malformed = sheet.find(({ key }) => !key);
+  if (malformed) throw new Error(`line ${malformed.line}: not a "<role>: <value>" line`);
+  const rows = sheet.filter(({ key }) => key === role.role || key === role.alias);
+  if (rows.length > 1) throw new Error(`"${roleName}" appears twice; only one line may set it`);
+  const expected = tiers[role.tier];
+  const problem = rows.length && fixedEntryProblem(roleName, rows[0].value, expected);
+  if (problem) throw new Error(problem);
+  return parseEntry(expected);
+}
+
 // Problems with a parsed sheet, for the role vocabulary of models.json (each
 // role with its `tier`, and the `alias` a released sheet may still use), its
 // tier defaults, and an `orchestrator_capabilities` catalog. A role whose tier
@@ -75,8 +102,9 @@ export function parseSheet(markdown) {
 // default must dispatch here too.
 // A `retired` role's line is one a released sheet still carries and no skill
 // reads, so it passes unchecked until setup-pstack drops it.
-// With no catalog, as in the installer's doctor, only the grammar is checked.
-export function checkSheet(sheet, { roles, defaults, catalog, retired = [] }) {
+// With no catalog, check the grammar and sheet policy. When setup supplies
+// unavailableFixed, it receives catalog problems for fixed roles there.
+export function checkSheet(sheet, { roles, defaults, catalog, retired = [], unavailableFixed }) {
   const problems = [];
   const byRole = new Map(roles.flatMap((r) => [[r.role, r], ...(r.alias ? [[r.alias, r]] : [])]));
   const seen = new Set();
@@ -100,6 +128,13 @@ export function checkSheet(sheet, { roles, defaults, catalog, retired = [] }) {
     const role = byRole.get(key);
     if (!role) {
       problems.push(`"${key}" is not a pstack role`);
+      continue;
+    }
+    if (role.fixed) {
+      const expected = defaults[role.tier];
+      const problem = fixedEntryProblem(key, value, expected);
+      if (problem) problems.push(problem);
+      else (unavailableFixed ?? problems).push(...checkTarget(parseEntry(expected), catalog).map((p) => `${key}: ${p}`));
       continue;
     }
     const texts = value.split(",");
@@ -131,8 +166,9 @@ export function checkSheet(sheet, { roles, defaults, catalog, retired = [] }) {
     }
   }
   for (const role of roles.filter((r) => !seen.has(r.role))) {
+    const diagnostics = role.fixed ? unavailableFixed ?? problems : problems;
     for (const entry of [defaults[role.tier]].flat()) {
-      problems.push(...checkTarget(parseEntry(entry), catalog).map((p) => `${role.role} (no line, tier default): ${p}`));
+      diagnostics.push(...checkTarget(parseEntry(entry), catalog).map((p) => `${role.role} (no line, tier default): ${p}`));
     }
   }
   return problems;
@@ -171,19 +207,38 @@ function allowedValues(option) {
 
 const invoked = process.argv[1] && existsSync(process.argv[1]) ? realpathSync(process.argv[1]) : null;
 if (invoked === fileURLToPath(import.meta.url)) {
-  const [sheetPath, catalogPath] = process.argv.slice(2);
-  if (!sheetPath || !catalogPath) {
-    console.error("usage: t3-sheet.mjs <sheet.md> <catalog.json>");
+  const args = process.argv.slice(2);
+  const models = JSON.parse(readFileSync(new URL("../../../models.json", import.meta.url), "utf8"));
+  if (args[0] === "--resolve-fixed-role" && (args.length === 2 || args.length === 3)) {
+    const [, roleName, sheetPath] = args;
+    try {
+      const sheet = sheetPath ? readSheet(sheetPath) : [];
+      console.log(JSON.stringify(resolveFixedRole(sheet, roleName, models)));
+    } catch (err) {
+      console.error(err.message);
+      process.exit(1);
+    }
+    process.exit(0);
+  }
+  const [sheetPath, catalogPath, flag] = args;
+  if (args.length !== 2 && !(args.length === 3 && flag === "--allow-unavailable-fixed")) {
+    console.error("usage: t3-sheet.mjs <sheet.md> <catalog.json> [--allow-unavailable-fixed]");
+    console.error("       t3-sheet.mjs --resolve-fixed-role <role> [sheet.md]");
     process.exit(2);
   }
-  const { roles, tiers, retired } = JSON.parse(readFileSync(new URL("../../../models.json", import.meta.url), "utf8"));
-  const problems = checkSheet(parseSheet(readFileSync(sheetPath, "utf8")), {
+  const { roles, tiers, retired } = models;
+  const unavailableFixed = flag ? [] : undefined;
+  const problems = checkSheet(readSheet(sheetPath), {
     roles,
     defaults: tiers,
     catalog: JSON.parse(readFileSync(catalogPath, "utf8")),
     retired,
+    unavailableFixed,
   });
+  for (const problem of unavailableFixed ?? []) console.log(`unavailable: ${problem}`);
   for (const problem of problems) console.log(problem);
   if (problems.length) process.exit(1);
-  console.log("ok: every role line parses and dispatches on this T3");
+  console.log(unavailableFixed?.length
+    ? "ok: the sheet is valid and its other roles dispatch on this T3"
+    : "ok: every role line parses and dispatches on this T3");
 }

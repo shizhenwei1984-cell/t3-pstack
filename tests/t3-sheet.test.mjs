@@ -20,6 +20,35 @@ const catalog = JSON.parse(readFileSync(catalogPath, "utf8"));
 const { roles, tiers: defaults, retired } = loadModels();
 const check = (text, over = catalog) => checkSheet(parseSheet(text), { roles, defaults, catalog: over, retired });
 const PANEL = "interrogate reviewers";
+const COMMENT_REVIEW = "comment-review";
+const HYDROGEN = "antigravity/gemini-4-hydrogen thought_level=medium";
+const HYDROGEN_TARGET = {
+  providerInstanceId: "antigravity",
+  model: "gemini-4-hydrogen",
+  options: { thought_level: "medium" },
+};
+
+function withoutHydrogen() {
+  const unavailable = structuredClone(catalog);
+  const antigravity = unavailable.providers.find((p) => p.providerInstanceId === "antigravity");
+  antigravity.models = antigravity.models.filter((m) => m.id !== HYDROGEN_TARGET.model);
+  return unavailable;
+}
+
+const MISSING_HYDROGEN = 'antigravity/gemini-4-hydrogen: "antigravity" does not list model "gemini-4-hydrogen"';
+const INVALID_COMMENT_REVIEW = `${COMMENT_REVIEW}: requires ${HYDROGEN}`;
+const INVALID_COMMENT_REVIEW_ENTRIES = [
+  "auto",
+  "inherit-parent",
+  "antigravity/gemini-4-neon thought_level=medium",
+  "cursor/composer-2.5 fastMode=false",
+  "other/gemini-4-hydrogen thought_level=medium",
+  "antigravity/gemini-4-hydrogen",
+  "antigravity/gemini-4-hydrogen thought_level=xhigh",
+  "antigravity/gemini-4-hydrogen thought_level=low",
+  `${HYDROGEN} fastMode=false`,
+  `${HYDROGEN}, ${HYDROGEN}`,
+];
 
 describe("parseEntry", () => {
   test("keeps a Pi model ID that has its own provider prefix", () => {
@@ -87,8 +116,28 @@ describe("checkSheet against a catalog", () => {
   test("the default sheet setup-pstack writes dispatches", () => {
     const setup = readFileSync(join(root, "plugins/pstack/skills/setup-pstack/SKILL.md"), "utf8");
     const sheet = setup.match(/```markdown\n(# pstack model configuration \(T3\)[\s\S]*?)```/)[1];
-    expect(parseSheet(sheet)).toHaveLength(roles.length + 1);
+    const rows = parseSheet(sheet);
+    expect(rows).toHaveLength(roles.length + 1);
+    const reviewer = rows.find(({ key }) => key === COMMENT_REVIEW);
+    expect(reviewer?.value).toBe(HYDROGEN);
+    expect(parseEntry(reviewer.value)).toEqual(HYDROGEN_TARGET);
     expect(check(sheet)).toEqual([]);
+  });
+
+  test("reports when Hydrogen is missing for an explicit row or an older sheet", () => {
+    const unavailable = withoutHydrogen();
+    expect(check("session hook: on", unavailable)).toEqual([
+      `${COMMENT_REVIEW} (no line, tier default): ${MISSING_HYDROGEN}`,
+    ]);
+    expect(check(`${COMMENT_REVIEW}: ${HYDROGEN}`, unavailable)).toEqual([
+      `${COMMENT_REVIEW}: ${MISSING_HYDROGEN}`,
+    ]);
+  });
+
+  test.each(INVALID_COMMENT_REVIEW_ENTRIES)("rejects %s for comment-review regardless of the catalog", (entry) => {
+    const sheet = `${COMMENT_REVIEW}: ${entry}`;
+    expect(check(sheet)).toEqual([INVALID_COMMENT_REVIEW]);
+    expect(check(sheet, null)).toEqual([INVALID_COMMENT_REVIEW]);
   });
 
   test("names each entry that cannot dispatch here", () => {
@@ -121,7 +170,8 @@ describe("checkSheet against a catalog", () => {
     const problems = (lines) => check(lines.join("\n"), values);
     const missingDefault = (p) =>
       p.includes('(no line, tier default): claudeAgent/claude-fable-5-2: "claudeAgent" does not list model "claude-fable-5-2"') ||
-      p.includes('(no line, tier default): antigravity/gemini-4-neon: no provider instance "antigravity" in this T3');
+      p.includes('(no line, tier default): antigravity/gemini-4-neon: no provider instance "antigravity" in this T3') ||
+      p === 'comment-review (no line, tier default): antigravity/gemini-4-hydrogen: no provider instance "antigravity" in this T3';
     const valid = [
       "bug-fix: claudeAgent/claude-opus-5-5 effort=high fastMode=true",
       "feature, refactoring: codex/gpt-6.1-sol reasoningEffort=xhigh serviceTier=priority",
@@ -155,13 +205,15 @@ describe("checkSheet against a catalog", () => {
     const noGemini = structuredClone(catalog);
     noGemini.providers = noGemini.providers.filter((p) => p.providerInstanceId !== "antigravity");
     const panelRoles = roles.filter((r) => Array.isArray(defaults[r.tier])).map((r) => r.role);
-    expect(check("session hook: on", noGemini)).toEqual(
-      panelRoles.map(
+    const unavailableReviewer = 'comment-review (no line, tier default): antigravity/gemini-4-hydrogen: no provider instance "antigravity" in this T3';
+    expect(check("session hook: on", noGemini)).toEqual([
+      ...panelRoles.map(
         (role) => `${role} (no line, tier default): antigravity/gemini-4-neon: no provider instance "antigravity" in this T3`,
       ),
-    );
+      unavailableReviewer,
+    ]);
     const lines = panelRoles.map((role) => `${role}: claudeAgent/claude-opus-5-5, codex/gpt-6.1-sol`).join("\n");
-    expect(check(lines, noGemini)).toEqual([]);
+    expect(check(lines, noGemini)).toEqual([unavailableReviewer]);
   });
 
   test("a panel on one family fails, whatever providers serve it", () => {
@@ -318,6 +370,72 @@ describe("t3-sheet.mjs CLI", () => {
 
   test("exits 0 on a sheet that dispatches", () => {
     expect(run(script, "bug-fix: grok/grok-4.7 reasoningEffort=xhigh\n").status).toBe(0);
+  }, CLI_TIMEOUT);
+
+  const resolve = (sheet) => {
+    const args = [script, "--resolve-fixed-role", COMMENT_REVIEW];
+    if (sheet !== undefined) {
+      const sheetPath = join(dir, "resolve.md");
+      writeFileSync(sheetPath, sheet);
+      args.push(sheetPath);
+    }
+    return spawnSync("node", args, { encoding: "utf8" });
+  };
+
+  test("resolves a missing sheet or row and keeps medium under every budget", () => {
+    const sheets = [
+      undefined,
+      "# defaults: 2\nsession hook: on",
+      "# budget: large (xhigh)",
+      `# budget: medium (high)\n${COMMENT_REVIEW}: ${HYDROGEN}`,
+      `# budget: small (medium)\n${COMMENT_REVIEW}: ${HYDROGEN}`,
+    ];
+    for (const sheet of sheets) {
+      const result = resolve(sheet);
+      expect(result.status).toBe(0);
+      expect(JSON.parse(result.stdout)).toEqual(HYDROGEN_TARGET);
+    }
+  }, CLI_TIMEOUT);
+
+  test("refuses to resolve invalid, malformed, or duplicate reviewer rows", () => {
+    const invalid = resolve(`${COMMENT_REVIEW}: auto`);
+    expect(invalid.status).toBe(1);
+    expect(invalid.stderr).toContain(INVALID_COMMENT_REVIEW);
+    const malformed = resolve(`${COMMENT_REVIEW}:  ${HYDROGEN}`);
+    expect(malformed.status).toBe(1);
+    expect(malformed.stderr).toContain("line 1");
+    const duplicate = resolve(`${COMMENT_REVIEW}: ${HYDROGEN}\n${COMMENT_REVIEW}: ${HYDROGEN}`);
+    expect(duplicate.status).toBe(1);
+    expect(duplicate.stderr).toContain("appears twice");
+  }, CLI_TIMEOUT);
+
+  test("resolves a UTF-16LE model sheet written by PowerShell", () => {
+    const sheet = Buffer.from(`\uFEFF# budget: small (medium)\r\n${COMMENT_REVIEW}: ${HYDROGEN}\r\n`, "utf16le");
+    const result = resolve(sheet);
+    expect(result.status).toBe(0);
+    expect(JSON.parse(result.stdout)).toEqual(HYDROGEN_TARGET);
+  }, CLI_TIMEOUT);
+
+  test("setup can save other roles while reporting an unavailable fixed reviewer", () => {
+    const sheetPath = join(dir, "setup.md");
+    const unavailablePath = join(dir, "without-hydrogen.json");
+    writeFileSync(unavailablePath, JSON.stringify(withoutHydrogen()));
+    const validate = (sheet) => {
+      writeFileSync(sheetPath, sheet);
+      return spawnSync("node", [script, sheetPath, unavailablePath, "--allow-unavailable-fixed"], { encoding: "utf8" });
+    };
+    const legacy = validate("session hook: on");
+    expect(legacy.status).toBe(0);
+    expect(legacy.stdout).toContain(`unavailable: ${COMMENT_REVIEW} (no line, tier default): ${MISSING_HYDROGEN}`);
+    const explicit = validate(`${COMMENT_REVIEW}: ${HYDROGEN}`);
+    expect(explicit.status).toBe(0);
+    expect(explicit.stdout).toContain(`unavailable: ${COMMENT_REVIEW}: ${MISSING_HYDROGEN}`);
+    const invalid = validate(`${COMMENT_REVIEW}: auto`);
+    expect(invalid.status).toBe(1);
+    expect(invalid.stdout).toContain(INVALID_COMMENT_REVIEW);
+    const unrelated = validate("bug-fix: grok/grok-9");
+    expect(unrelated.status).toBe(1);
+    expect(unrelated.stdout).toContain('bug-fix: grok/grok-9: "grok" does not list model "grok-9"');
   }, CLI_TIMEOUT);
 });
 

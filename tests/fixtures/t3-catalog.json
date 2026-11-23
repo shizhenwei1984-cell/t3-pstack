@@ -60,6 +60,7 @@
       "providerInstanceId": "antigravity",
       "driverKind": "antigravity",
       "models": [
+        { "id": "gemini-4-hydrogen", "options": [{ "id": "thought_level", "values": ["low", "medium", "high", "xhigh"] }] },
         { "id": "gemini-4-neon", "options": [{ "id": "thought_level", "values": ["low", "medium", "high", "xhigh"] }] },
         { "id": "gemini-4-carbon", "options": [{ "id": "thought_level", "values": ["low", "medium", "high", "xhigh"] }] }
       ],

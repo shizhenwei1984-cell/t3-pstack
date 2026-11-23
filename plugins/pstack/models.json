@@ -11,7 +11,8 @@
     "judges": [
       "claudeAgent/claude-opus-5-5 effort=high",
       "antigravity/gemini-4-neon thought_level=xhigh"
-    ]
+    ],
+    "comment-review": "antigravity/gemini-4-hydrogen thought_level=medium"
   },
   "roles": [
     { "role": "explore", "tier": "explore", "skill": "poteto-mode" },
@@ -23,7 +24,8 @@
     { "role": "arena runners", "tier": "panel", "skill": "arena" },
     { "role": "arena cross-judge pool", "tier": "judges", "skill": "arena" },
     { "role": "swarm workers", "tier": "fast", "skill": "swarm" },
-    { "role": "interrogate reviewers", "tier": "panel", "skill": "interrogate" }
+    { "role": "interrogate reviewers", "tier": "panel", "skill": "interrogate" },
+    { "role": "comment-review", "tier": "comment-review", "skill": "no-comments", "fixed": true }
   ],
   "retired": [
     "how explorer",

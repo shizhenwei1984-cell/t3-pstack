@@ -70,7 +70,7 @@ describe("regions", () => {
   test("every skill a role names gets that role's tier default stamped in its Models section", () => {
     const marked = {
       ...models,
-      tiers: { explore: "x/marker-explore", default: "x/marker-default", fast: "x/marker-fast", panel: ["a/claude-p", "b/gpt-p"], judges: ["c/claude-j", "d/gemini-j"] },
+      tiers: { explore: "x/marker-explore", default: "x/marker-default", fast: "x/marker-fast", panel: ["a/claude-p", "b/gpt-p"], judges: ["c/claude-j", "d/gemini-j"], "comment-review": "x/marker-comment-review" },
     };
     for (const skill of new Set(models.roles.map((r) => r.skill))) {
       const file = `plugins/pstack/skills/${skill}/SKILL.md`;
@@ -82,6 +82,7 @@ describe("regions", () => {
           fast: "`x/marker-fast`",
           panel: "`a/claude-p`, `b/gpt-p`",
           judges: "`c/claude-j`, `d/gemini-j`",
+          "comment-review": "`x/marker-comment-review`",
         }[role.tier];
         expect(stamped).toContain(`- ${role.role}: ${expected}`);
       }

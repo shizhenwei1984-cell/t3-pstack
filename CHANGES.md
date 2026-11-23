@@ -8,6 +8,8 @@ Every implementation brief includes ownership of the regression test. A one-off 
 
 The installed plugin includes the Python task and validation evidence tools. They preserve and verify pinned snapshots, render verification reports, and check fixture artifacts and visible candidate state. The engineering reference covers evidence provenance, decision preservation, multi-stage regression cases, and recipient review. The evidence commands support local Linux filesystems, macOS APFS, and Windows NTFS. Guarded publication keeps its crash recovery on all three platforms, and preflight records native process identity for each OS. CI runs the Python regression suites on all three platforms and exercises the staged plugin through PowerShell on Windows.
 
+Comment Sicko screens scoped comments read-only on the fixed T3 `comment-review` target, Antigravity Gemini 4 Hydrogen with `thought_level=medium`. Older sheets use that target without a new row. Setup reports an unavailable reviewer without replacing it. The parent owns edits and decisions about constraints.
+
 ## 2.6.2-explore.2 - Require test-first implementation
 
 Every pstack code writer follows the bundled TDD workflow. Record a meaningful failing run before editing implementation, then rerun the same check and the relevant suite. Behavior-preserving work keeps a characterization baseline. A missing executable Red blocks the edit.

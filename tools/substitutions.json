@@ -496,9 +496,9 @@
       "files": "^skills/thermos/SKILL\\.md$"
     },
     {
-      "pattern": "1. Spawn `Task` with `subagent_type: \"comment-sicko\"`. Pass the scope.",
-      "replacement": "1. Dispatch one `delegate_task` child (`mode: \"async\"`, `role: \"review\"`) whose brief opens with \"Read `<plugin root>/agents/comment-sicko.md` in full and act as it says\" (`<plugin root>` is the directory that holds this plugin's `skills/`). Pass the scope, and no worktree, because a worktree lacks the scope's uncommitted changes.",
-      "rationale": "Per-skill notes: no-comments",
+      "pattern": "1. Spawn `Task` with `subagent_type: \"comment-sicko\"`. Pass the scope. Pick each subagent's reasoning level for the job, per the Subagents section of the **poteto-mode** skill. Do not restate its rules.",
+      "replacement": "1. If the operator explicitly chose a target for this run, use it. Otherwise locate the existing sheet as described in [poteto-mode](../poteto-mode/SKILL.md#models). Run `node <plugin root>/skills/setup-pstack/scripts/t3-sheet.mjs --resolve-fixed-role comment-review <sheet path>`. Omit the path if neither sheet exists. Use `bun` if Node is unavailable. Here, `<plugin root>` is the directory that holds this plugin's `skills/`. Pass the resolver's JSON output unchanged as `target`.\n\n   Dispatch one `delegate_task` child with `mode: \"async\"` and `role: \"review\"`. Start the brief with the worker.md pointer from poteto-mode, then \"Read `<plugin root>/agents/comment-sicko.md` in full and act as it says\". Give the child the scope and instruct it to review read-only, with no worktree so it can read uncommitted changes.\n\n   If resolution fails, the target is unavailable, or dispatch or the child fails, report the specific error and leave the review open. Use only the resolved or operator-selected target with its exact options.",
+      "rationale": "Dispatches the fixed comment-review target without carrying upstream's general per-job reasoning adjustment.",
       "files": "^skills/no-comments/SKILL\\.md$"
     },
     {
