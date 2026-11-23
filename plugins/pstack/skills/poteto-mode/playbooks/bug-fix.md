@@ -10,6 +10,7 @@ Be scientific. Every shipped line traces to runtime evidence. Belt-and-suspender
 4. Verify on the same surface. The original repro now passes. "Inconclusive" or wrong-surface is not a pass. Flag it. Unit tests show branch behavior, not bug absence.
 5. Stage the commits so the failing repro lands before the fix in git history. Apply the **tdd** skill before the first implementation edit, including fixes exercised only by integration tests.
    This is the canonical **sequence-verifiable-units** principle skill, the failing test first and the fix on top.
+   When preprocessing or entry gates can change the result, cover the affected entry and input combinations during Red. Follow [Test regressions across stages](../references/engineering-enhancements.md#test-regressions-across-stages). For literal fixture artifacts, use [validation evidence](../references/validation-evidence.md).
 6. Run **Opening a PR**.
 
 **Reply:** what was broken, root cause, fix, how you verified. Paste failing-then-passing repro output verbatim.

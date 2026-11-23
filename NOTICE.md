@@ -6,7 +6,7 @@ t3-pstack is a port of [pstack](https://github.com/cursor/plugins/tree/main/psta
 
 | Component | Upstream | Copyright | License | License file |
 | --- | --- | --- | --- | --- |
-| Every skill under `plugins/pstack/skills/` except those named in the next two rows, `plugins/pstack/agents/poteto-agent.md`, `plugins/pstack/agents/comment-sicko.md`, and the vendored scripts under `plugins/pstack/skills/poteto-mode/scripts/` | [cursor/plugins/pstack @ 0b46ec3](https://github.com/cursor/plugins/tree/0b46ec399d55f2829e88822998f53b84944837d3/pstack) | (c) 2026 Lauren Tan | MIT | [LICENSE](LICENSE) |
+| Every upstream pstack skill under `plugins/pstack/skills/` except those named in the next two rows, `plugins/pstack/agents/poteto-agent.md`, `plugins/pstack/agents/comment-sicko.md`, and the Cursor pstack scripts under `plugins/pstack/skills/poteto-mode/scripts/` | [cursor/plugins/pstack @ 0b46ec3](https://github.com/cursor/plugins/tree/0b46ec399d55f2829e88822998f53b84944837d3/pstack) | (c) 2026 Lauren Tan | MIT | [LICENSE](LICENSE) |
 | `plugins/pstack/skills/{deslop,fix-ci,fix-merge-conflicts,get-pr-comments,make-pr-easy-to-review,what-did-i-get-done}/` | [cursor/plugins/cursor-team-kit @ 0b46ec3](https://github.com/cursor/plugins/tree/0b46ec399d55f2829e88822998f53b84944837d3/cursor-team-kit) | (c) 2026 Cursor | MIT | [LICENSE-cursor-team-kit](LICENSE-cursor-team-kit) |
 | `plugins/pstack/skills/{thermos,thermo-nuclear-review,thermo-nuclear-code-quality-review}/`, `plugins/pstack/agents/thermo-nuclear-review-subagent.md`, `plugins/pstack/agents/thermo-nuclear-code-quality-review-subagent.md` | [cursor/plugins/thermos @ 0b46ec3](https://github.com/cursor/plugins/tree/0b46ec399d55f2829e88822998f53b84944837d3/thermos) | (c) 2026 Cursor | MIT | [LICENSE-thermos](LICENSE-thermos) |
 | `tools/sync.mjs`, `tools/generate.mjs`, `tools/validate-skills.mjs`, `tools/plugin.mjs`, `plugins/pstack/hooks/session-start.sh`, `plugins/pstack/hooks/session-start.ps1`, `plugins/pstack/skills/setup-pstack/scripts/read-sheet.sh`, and the tests that cover them, each modified by t3-pstack | [michael-denyer/pstack-claude](https://github.com/michael-denyer/pstack-claude), as merged into t3-pstack through 1.0.14 | (c) 2026 Michael Denyer | MIT | [LICENSE](LICENSE) |
@@ -18,6 +18,8 @@ t3-pstack is a port of [pstack](https://github.com/cursor/plugins/tree/main/psta
 
 [CHANGES.md](CHANGES.md) records each release's changes. [`tools/substitutions.json`](tools/substitutions.json) lists every rewrite of upstream text with the reason for each, and [`tools/forks.json`](tools/forks.json) names each upstream file the port keeps in its own form and why.
 
+The task and validation evidence scripts, their document guard dependency, the Python regression tests including the standalone guard suite, and selected engineering guidance come from [pstack-herdr at f6f052b](https://github.com/shizhenwei1984-cell/pstack-herdr/commit/f6f052b), which ported them from pstack-orca.
+
 - Plugin content lives at `plugins/pstack/`, with a Claude Code manifest (`.claude-plugin/plugin.json`) and a Codex manifest (`.codex-plugin/plugin.json`). The repository root holds both marketplaces (`.claude-plugin/marketplace.json`, `.agents/plugins/marketplace.json`) and the license, notice, readme, and changelog.
 - Upstream's skill text is rewritten in place into its T3 form by the substitutions: Cursor's subagent tool, model slugs, model rule, cloud agents, and `/loop` become T3's `delegate_task`, sheet entries, `schedule_task`, and related tools. The `poteto-mode` skill drops upstream's `disable-model-invocation` flag so the session-start hook can invoke it.
 - `plugins/pstack/skills/setup-pstack/SKILL.md` is a declared fork that writes the T3 model sheet. The watch-pr settle overlay (`plugins/pstack/skills/poteto-mode/scripts/watch-pr/settle.ts`) is t3-pstack's own, with declared forks at its hook points in upstream's watch-pr. The files that carry Michael Denyer's rules and watch-pr fixes, listed above, are declared forks too, as are the worktree audit and the cleanup playbook, which fix [cursor/plugins#449](https://github.com/cursor/plugins/issues/449).
@@ -27,6 +29,7 @@ t3-pstack is a port of [pstack](https://github.com/cursor/plugins/tree/main/psta
 - `plugins/pstack/.claude-plugin/plugin.json`, `plugins/pstack/.codex-plugin/plugin.json`, `.claude-plugin/marketplace.json`, `.agents/plugins/marketplace.json`
 - `plugins/pstack/hooks/hooks.json`, `plugins/pstack/hooks/codex-hooks.json`, and `plugins/pstack/hooks/session-start-context.md` (each host's session-start hook and its routing text)
 - `plugins/pstack/models.json`, `plugins/pstack/skills/setup-pstack/scripts/t3-sheet.mjs`, `plugins/pstack/skills/poteto-mode/scripts/watch-pr/settle.ts`, `tools/derive-t3.mjs`
+- `plugins/pstack/skills/poteto-mode/scripts/evidence_fs.py` and the staged evidence smoke tests
 - `NOTICE.md` (this file), `NOTICE-skills.md`, `README.md`, `CHANGES.md`
 
 `LICENSE-cursor-team-kit` and `LICENSE-thermos` are copied verbatim from upstream cursor-team-kit and thermos rather than authored for this port.

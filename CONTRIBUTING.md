@@ -11,7 +11,7 @@ Upstream owns the skill text. This port owns the rewrite of upstream's Cursor me
 - **Substitutions.** [`tools/substitutions.json`](tools/substitutions.json) rewrites each upstream sentence that names a Cursor mechanism: the `Task` tool, `subagent_type`, model slugs, the `pstack-models.mdc` rule, cloud agents, `/loop`, Cursor paths. Most T3 behavior the port adds, such as the dispatch ledger, is an anchored insert: a rule whose pattern is an upstream sentence and whose replacement keeps that sentence and appends the T3 text. A substitution leaves upstream's later edits elsewhere in the file mechanical, so the port prefers it to a fork. Each rule's `rationale` names why it exists, and most cite the section of t3-pstack 1.0.14's `t3-tools.md` it replaces.
 - **Forks.** [`tools/forks.json`](tools/forks.json) declares each file the port keeps in its own form, with a `kind`, a one-sentence `why`, the `since` release, and an `upstream` status. Today that is setup-pstack, which writes the T3 model sheet, the hook points of the watch-pr settle overlay, the poteto-mode scripts' bootstrap, which installs their dependencies outside the installed plugin, the files that carry the rules and watch-pr fixes restored from Michael Denyer's pstack-claude, and the worktree audit and cleanup playbook, which fix [cursor/plugins#449](https://github.com/cursor/plugins/issues/449). Every upstream change to a forked file needs a person to merge it, so a fork is the last resort.
 
-The port also owns files upstream does not have: the plugin manifests, the session-start hooks and their routing text, `models.json`, the sheet checker `t3-sheet.mjs`, and the watch-pr settle overlay (`settle.ts`). The sync lists them as port-only.
+The port also owns files upstream does not have, including the plugin manifests, the session-start hooks, `models.json`, the sheet checker `t3-sheet.mjs`, and the watch-pr settle overlay (`settle.ts`). The evidence scripts and their references under `skills/poteto-mode/` are also port-only. The sync lists these files as port-only.
 
 Before changing a file under `plugins/pstack/skills` or `plugins/pstack/agents`, work out which kind of change it is:
 
@@ -51,7 +51,29 @@ The generator stamps `VERSION` into the Claude Code manifest, whose version a Ki
 
 Change model defaults in `models.json`, never in a skill body. A role names a tier (`default`, `fast`, `panel`, or `judges`), and each tier holds T3 entries in the grammar `t3-sheet.mjs` checks. `panel` and `judges` are lists, and each must span two model families. A role may carry an `alias`, the label a sheet written before upstream renamed the role still uses. When upstream drops a role, move its label to `retired`, so the checker and `doctor` pass the line a released sheet still carries.
 
-If you touched `skills/poteto-mode/scripts/`:
+If you touched the Python evidence scripts, run the suites with Python 3.10 or
+later on your host. CI uses Python 3.12 on Linux, macOS, and Windows. Test
+fixtures live under your home directory. Set `PSTACK_EVIDENCE_TEST_ROOT` or
+`PSTACK_GUARD_TEST_ROOT` to use another user-owned directory outside temp and
+plugin trees. Use a Windows host with Win32 long paths enabled for the native
+smoke tests.
+
+```shell
+python -B -m unittest discover -s tests -p 'test_*_evidence.py' -v
+python -B -m unittest discover -s tests -p 'test_evidence_fs.py' -v
+python -B -m unittest discover -s tests -p 'test_guarded_document.py' -v
+python -B tests/evidence_cli_smoke.py
+```
+
+On Windows, also run `pwsh -NoProfile -File ./tests/evidence-powershell-smoke.ps1`.
+Set `PSTACK_EVIDENCE_UNSUPPORTED_VOLUME` to an empty fixture directory on a
+local non-NTFS volume to test native write rejection on that volume. The
+alternate-owner test needs a token that can assign the Local Service SID.
+The short-name test needs the NTFS fixture volume to generate an 8.3 alias.
+The smoke tests stage a copy of the plugin, run its commands, and compare its
+file inventory before and after the run.
+
+If you touched the Bun tooling under `skills/poteto-mode/scripts/`:
 
 ```shell
 cd plugins/pstack/skills/poteto-mode/scripts

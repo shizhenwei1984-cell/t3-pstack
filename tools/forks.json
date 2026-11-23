@@ -2,7 +2,7 @@
   "pstack": {
     "plugins/pstack/skills/poteto-mode/SKILL.md": {
       "kind": "policy",
-      "why": "Carries four rules from Michael Denyer's pstack-claude in T3 wording: load a managed platform's skill before deploying, stop an abandoned agent whose writes could overlap its replacement's with task_cancel and confirm with task_status that it stopped, which Autopilot-full's immediate replacement of a stuck agent overrides, keep a review gate closed while no independent reviewer can run, and keep the todolist in .audit/<task-slug>.todo.md when the session has no task tool.",
+      "why": "Carries four rules from Michael Denyer's pstack-claude in T3 wording: load a managed platform's skill before deploying, stop an abandoned agent whose writes could overlap its replacement's with task_cancel and confirm with task_status that it stopped, which Autopilot-full's immediate replacement of a stuck agent overrides, keep a review gate closed while no independent reviewer can run, and keep the todolist in .audit/<task-slug>.todo.md when the session has no task tool. Links the port-only engineering-enhancements.md, task-evidence.md, and validation-evidence.md references and their scripts task_evidence.py, validation-evidence.py, and guarded_document.py. The port ships evidence_fs.py alongside those scripts and exercises the installed boundary with tests/test_guarded_document.py and staged CLI smoke tests.",
       "since": "2.0.0-rc.2",
       "upstream": "not-proposed"
     },
@@ -14,7 +14,7 @@
     },
     "plugins/pstack/skills/poteto-mode/playbooks/opening-a-pr.md": {
       "kind": "policy",
-      "why": "Carries the rule from Michael Denyer's pstack-claude that every live agent holding a worktree is stopped, and the stop confirmed, before a commit, merge, or deploy from it.",
+      "why": "Carries Michael Denyer's stop-live-agents rule before commit, merge, or deploy and adds recipient review before and after authorized PR writes.",
       "since": "2.0.0-rc.2",
       "upstream": "not-proposed"
     },
@@ -110,7 +110,7 @@
     },
     "plugins/pstack/skills/poteto-mode/playbooks/bug-fix.md": {
       "kind": "policy",
-      "why": "Requires observed Red before implementation and Green before handback for this personal fork.",
+      "why": "Requires observed Red and Green for this personal fork and links its multi-stage regression and fixture evidence references.",
       "since": "2.6.2-explore.2",
       "upstream": "not-proposed"
     }

@@ -11,3 +11,5 @@ This plugin contains MIT-licensed work from five sources. The copyright notices 
 | The plain-remove prune step in the worktree-cleanup playbook, which t3-pstack adapted | [sergchil/jutsu](https://github.com/sergchil/jutsu/commit/da9442422c72cc99442c1ce3500d2f2485234a31) | (c) 2026 Sergey Chilingaryan | [MIT](LICENSE) |
 
 t3-pstack rewrites upstream's Cursor mechanics into their T3 form and adds the files its [repository notice](https://github.com/chhoumann/t3-pstack/blob/main/NOTICE.md) lists. Those modifications are (c) 2026 Christian Bager Bach Houmann under the same [MIT license](LICENSE). The [change log](https://github.com/chhoumann/t3-pstack/blob/main/CHANGES.md) records each release.
+
+The Python evidence tools and selected engineering guidance in `skills/poteto-mode/` come from [pstack-herdr at f6f052b](https://github.com/shizhenwei1984-cell/pstack-herdr/commit/f6f052b), which ported them from pstack-orca.

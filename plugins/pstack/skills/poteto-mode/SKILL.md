@@ -29,6 +29,7 @@ The remaining triggers live only here:
 - Deploying to a managed platform (Cloudflare, Vercel, Fly, Netlify, and the like) → load that platform's skill, project-local or installed, before running its CLI, the same way Shipping step 1 resolves the forge before the first PR operation.
 - Bot review comments → judge each on its merits.
 - Long or unattended work → **show-me-your-work**.
+- Cross-stage evidence, multi-stage regression tests, or a PR write → [Engineering evidence and recipient review](references/engineering-enhancements.md).
 
 ## Principles
 

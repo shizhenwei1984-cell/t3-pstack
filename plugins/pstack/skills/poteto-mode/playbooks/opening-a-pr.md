@@ -6,4 +6,6 @@ Work from a git worktree off trunk, and keep unrelated work out of it. Rebase in
 
 Title: `type(scope): subject`, naming a real symbol when one carries the change. Body: a one-minute briefing under 40 lines with these `##` headings in order, dropping empty ones: `## Why`, `## What changed`, `## Scope`, `## Tradeoffs` (only rejected alternatives a reviewer would otherwise ask about), `## Blast Radius`, `## Verification`.
 
+Cross-check the title and body against confirmed decisions. Review the exact payload before an authorized write, then fetch and review the published text. Describe verification in terms the recipient can inspect and keep local provenance in the task record. Apply [Recipient review](../references/engineering-enhancements.md#recipient-review).
+
 Stack follow-ups by base branch. Open PRs ready, through the run's PR tool with `draft: false`. Without one, use `gh pr create` without `--draft`, or `origin pr create --status open` when Origin's CLI resolves the repository. Opening a PR does not start a babysit.

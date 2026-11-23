@@ -30,6 +30,33 @@ jobs:
       - name: Tool and invariant fixture tests
         run: bun test tests/ --timeout 30000
 
+  python-evidence:
+    name: Python evidence tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: "3.12"
+      - name: Run archive and validation tests
+        run: python -B -m unittest discover -s tests -p 'test_*_evidence.py' -v
+      - name: Run filesystem tests
+        run: python -B -m unittest discover -s tests -p 'test_evidence_fs.py' -v
+      - name: Run guarded document tests
+        run: python -B -m unittest discover -s tests -p 'test_guarded_document.py' -v
+      - name: Smoke test the staged evidence plugin
+        run: python -B tests/evidence_cli_smoke.py
+      - name: Exercise evidence commands in PowerShell
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./tests/evidence-powershell-smoke.ps1
+
   windows-hooks:
     name: Windows session hooks
     runs-on: windows-latest
